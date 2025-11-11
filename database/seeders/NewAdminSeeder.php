@@ -1,0 +1,41 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
+
+class NewAdminSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
+    public function run()
+    {
+        $email = 'aku@test.com';
+        $password = 'aku12345';
+
+        // ensure role exists if spatie is installed
+        if (class_exists(Role::class)) {
+            Role::firstOrCreate(['name' => 'admin']);
+        }
+
+        $user = User::firstOrCreate(
+            ['email' => $email],
+            [
+                'name' => 'Admin Dua',
+                'password' => Hash::make($password),
+            ]
+        );
+
+        if (method_exists($user, 'assignRole')) {
+            $user->assignRole('admin');
+        }
+
+        $this->command->info("Created user: {$email} with password: {$password}");
+    }
+}
